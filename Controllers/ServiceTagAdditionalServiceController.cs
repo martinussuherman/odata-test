@@ -32,22 +32,11 @@ namespace ODataTest
                 .ProjectTo<ServiceTagAdditionalServiceDto>(_mapper.ConfigurationProvider);
         }
 
-        // // http://localhost:60096/odata/Stadium(Name='Baz', Country='Germany')
-        // [ODataRoute("(Name={name}, Country={country})")]
-        // [EnableQuery(PageSize = 20, AllowedQueryOptions = AllowedQueryOptions.All)]
-        // [HttpGet]
-        // public IHttpActionResult Get([FromODataUri] string name, [FromODataUri] string country)
-        // {
-        //   return Ok(new Stadium { Capacity = 2300, Country = country, Name = name, Owner = "FC Zug" });
-        // }
-
-        [ODataRoute("(ServiceId={serviceId}, AdditionalServiceId={additionalServiceId})")]
+        [ODataRoute("({serviceId},{additionalServiceId})")]
         [ProducesResponseType(typeof(ServiceTagAdditionalServiceDto), Status200OK)]
         [ProducesResponseType(Status404NotFound)]
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Select)]
-        public SingleResult<ServiceTagAdditionalServiceDto> Get(
-            [FromODataUri] ushort serviceId,
-            [FromODataUri] ushort additionalServiceId)
+        public SingleResult<ServiceTagAdditionalServiceDto> Get(ushort serviceId, ushort additionalServiceId)
         {
             return SingleResult.Create(
                 _data
@@ -74,18 +63,15 @@ namespace ODataTest
             return Created(create);
         }
 
-        // [ODataRoute("serviceId={serviceId}, additionalServiceId={additionalServiceId}")]
-        [ODataRoute("(ServiceId={keyServiceId}, AdditionalServiceId={keyAdditionalServiceId})")]
+        [ODataRoute("({serviceId},{additionalServiceId})")]
         [ProducesResponseType(Status204NoContent)]
         [ProducesResponseType(Status404NotFound)]
-        public IActionResult Delete(
-            [FromODataUri] ushort keyserviceId,
-            [FromODataUri] ushort keyadditionalServiceId)
+        public IActionResult Delete(ushort serviceId, ushort additionalServiceId)
         {
             ServiceTagAdditionalService delete = _data
                 .FirstOrDefault(e =>
-                    e.ServiceId == keyserviceId &&
-                    e.AdditionalServiceId == keyadditionalServiceId);
+                    e.ServiceId == serviceId &&
+                    e.AdditionalServiceId == additionalServiceId);
 
             if (delete == null)
             {
