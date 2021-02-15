@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.OData;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -57,7 +58,25 @@ namespace ODataTest
             app.UseEndpoints(
                 endpoints =>
                 {
+                    // global odata query options
                     endpoints.Count();
+
+                    // the following will not work as expected
+                    // BUG: https://github.com/OData/WebApi/issues/1837
+                    // endpoints.SetDefaultODataOptions( 
+                    //     new ODataOptions() { UrlKeyDelimiter = Parentheses } );
+
+                    // endpoints
+                    //     .ServiceProvider
+                    //     .GetRequiredService<ODataOptions>()
+                    //     .UrlKeyDelimiter = ODataUrlKeyDelimiter.Parentheses;
+
+                    // register routes with and without the api version constraint
+                    endpoints.MapVersionedODataRoute(
+                        "explicit",
+                        "api/v{version:apiVersion}",
+                        modelBuilder);
+
                     endpoints.MapVersionedODataRoute("odata", "api", modelBuilder);
                 });
 
